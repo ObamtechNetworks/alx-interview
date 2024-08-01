@@ -1,41 +1,38 @@
 #!/usr/bin/python3
-"""
-Contains a function that checks if all boxes are unlockable
-"""
+"""LockBoxes Programming Challenge"""
+
+from typing import List
 
 
-def canUnlockAll(boxes):
-    """Function to return true or false if all boxes can
-    be unlocked
+def canUnlockAll(boxes: List[list]) -> bool:
+    """A function that checks if all lockboxes can be unlocked.
 
     Args:
-        boxes (box): a list of list to check
+        boxes (List[list]): Contains a list of lists of keys to other boxes.
 
     Returns:
-        bool: True if all box can be unlocked or False if not
+        bool: Returns True if all boxes can be unlocked, False otherwise.
     """
-    # Number of boxes
-    n = len(boxes)
-
-    # A set to keep track of which boxes have been opened
-    opened_boxes = set()
-
-    # A queue to manage keys we have to use to open other boxes
+    # Initialize a queue with the key to Box 0
     keys = [0]
 
+    # Use a set to track opened boxes
+    opened = set()
+
+    # While there are keys in the queue
     while keys:
-        # Get a key (box number) from the queue
-        current_key = keys.pop()
+        # Get the next key
+        key = keys.pop()
 
-        # If we haven't already opened this box
-        if current_key not in opened_boxes:
-            # Mark this box as opened
-            opened_boxes.add(current_key)
+        # If the corresponding box hasn't been opened
+        if key not in opened:
+            # Open the box
+            opened.add(key)
+            # Add the keys inside this box to our queue of keys
+            # Only add keys that are within the range of available boxes
+            for new_key in boxes[key]:
+                if new_key < len(boxes):
+                    keys.append(new_key)
 
-            # Add all the keys from this box to the queue
-            for key in boxes[current_key]:
-                if key < n and key not in opened_boxes:
-                    keys.append(key)
-
-    # If we've opened all the boxes, return True
-    return len(opened_boxes) == n
+    # Check if we've opened all boxes
+    return len(opened) == len(boxes)
