@@ -1,37 +1,41 @@
 #!/usr/bin/python3
-"""Unlock all boxes"""
+"""
+Contains a function that checks if all boxes are unlockable
+"""
 
 
 def canUnlockAll(boxes):
-    """A function that checks if all lockboxes can be unlocked.
+    """Function to return true or false if all boxes can
+    be unlocked
 
     Args:
-        boxes (List[list]): Contains a list of lists of keys to other boxes.
+        boxes (box): a list of list to check
 
     Returns:
-        bool: Returns True if all boxes can be unlocked, False otherwise.
+        bool: True if all box can be unlocked or False if not
     """
-    # Initialize a queue with the key to Box 0
+    # Number of boxes
+    n = len(boxes)
+
+    # A set to keep track of which boxes have been opened
+    opened_boxes = set()
+
+    # A queue to manage keys we have to use to open other boxes
     keys = [0]
 
-    # Use a set to track opened boxes
-    opened = set()
-
-    # While there are keys in the queue
     while keys:
-        # Get the next key
-        key = keys.pop()
+        # Get a key (box number) from the queue
+        current_key = keys.pop()
 
-        # If the corresponding box hasn't been opened
-        if key not in opened:
-            # Open the box
-            opened.add(key)
+        # If we haven't already opened this box
+        if current_key not in opened_boxes:
+            # Mark this box as opened
+            opened_boxes.add(current_key)
 
-            # Add the keys inside this box to our queue of keys
-            # Only add keys that are within the range of available boxes
-            for new_key in boxes[key]:
-                if new_key < len(boxes):
-                    keys.append(new_key)
+            # Add all the keys from this box to the queue
+            for key in boxes[current_key]:
+                if key < n and key not in opened_boxes:
+                    keys.append(key)
 
-    # Check if we've opened all boxes
-    return len(opened) == len(boxes)
+    # If we've opened all the boxes, return True
+    return len(opened_boxes) == n
