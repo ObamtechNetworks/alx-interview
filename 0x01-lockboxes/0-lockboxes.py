@@ -1,10 +1,8 @@
 #!/usr/bin/python3
 """LockBoxes Programming Challenge"""
 
-from typing import List
 
-
-def canUnlockAll(boxes: List[list]) -> bool:
+def canUnlockAll(boxes):
     """A function that checks lockboxes
     if all the boxes can be unlocked
 
