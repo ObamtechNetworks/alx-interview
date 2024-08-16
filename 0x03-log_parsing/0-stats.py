@@ -64,11 +64,13 @@ def log_parsing():
     except KeyboardInterrupt:
         # Print final metrics on keyboard interrupt
         print_metrics(total_size, status_counts)
-        sys.exit(0)
+        # sys.exit(0)
 
     # Print final metrics after loop ends
-    print_metrics(total_size, status_counts)
+    # print_metrics(total_size, status_counts)
 
 
-if __name__ == "__main__":
-    log_parsing()
+# if __name__ == "__main__":
+#     log_parsing()
+
+log_parsing()
