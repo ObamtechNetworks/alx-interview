@@ -13,14 +13,7 @@ def handle_broken_pipe(signal, frame):
 signal.signal(signal.SIGPIPE, handle_broken_pipe)
 
 
-total_size = 0  # Sum of file sizes
-status_counts = {
-    200: 0, 301: 0, 400: 0, 401: 0,
-    403: 0, 404: 0, 405: 0, 500: 0}  # Status code counts
-line_count = 0  # Line count tracker
-
-
-def print_metrics():
+def print_metrics(total_size, status_counts):
     """Prints the total file size and status code metrics."""
     print(f"File size: {total_size}")
     for code in sorted(status_counts.keys()):
@@ -28,41 +21,54 @@ def print_metrics():
             print(f"{code}: {status_counts[code]}")
 
 
-try:
-    for line in sys.stdin:
-        parts = line.split()
+def log_parsing():
+    """Does actual log parsing
+    """
+    total_size = 0  # Sum of file sizes
+    status_counts = {
+        200: 0, 301: 0, 400: 0, 401: 0,
+        403: 0, 404: 0, 405: 0, 500: 0}  # Status code counts
+    line_count = 0  # Line count tracker
 
-        # Validate line format
-        if len(parts) < 9:
-            continue
+    try:
+        for line in sys.stdin:
+            parts = line.split()
 
-        # Extract relevant parts
-        try:
-            status_code = int(parts[-2])
-            file_size = int(parts[-1])
+            # Validate line format
+            if len(parts) < 7:
+                continue
 
-            # Update total size
-            total_size += file_size
+            # Extract relevant parts
+            try:
+                status_code = int(parts[-2])
+                file_size = int(parts[-1])
 
-            # Update status code count
-            if status_code in status_counts:
-                status_counts[status_code] += 1
+                # Update total size
+                total_size += file_size
 
-            # Increment line count
-            line_count += 1
+                # Update status code count
+                if status_code in status_counts:
+                    status_counts[status_code] += 1
 
-            # Print metrics every 10 lines
-            if line_count % 10 == 0:
-                print_metrics()
+                # Increment line count
+                line_count += 1
 
-        except (ValueError, IndexError):
-            # Skip line if there's an error in parsing
-            continue
+                # Print metrics every 10 lines
+                if line_count % 10 == 0:
+                    print_metrics(total_size, status_counts)
 
-except KeyboardInterrupt:
-    # Print final metrics on keyboard interrupt
-    print_metrics()
-    raise
+            except (ValueError, IndexError):
+                # Skip line if there's an error in parsing
+                continue
 
-# Print final metrics after loop ends
-print_metrics()
+    except KeyboardInterrupt:
+        # Print final metrics on keyboard interrupt
+        print_metrics(total_size, status_counts)
+        raise
+
+    # Print final metrics after loop ends
+    print_metrics(total_size, status_counts)
+
+
+if __name__ == "__main__":
+    log_parsing()
