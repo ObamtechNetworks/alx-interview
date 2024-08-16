@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+"""LOG PARSING"""
 import sys
 import signal
 
