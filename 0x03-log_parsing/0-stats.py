@@ -67,7 +67,7 @@ def log_parsing():
         # sys.exit(0)
 
     # Print final metrics after loop ends
-    # print_metrics(total_size, status_counts)
+    print_metrics(total_size, status_counts)
 
 
 # if __name__ == "__main__":
