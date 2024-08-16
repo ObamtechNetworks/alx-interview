@@ -32,11 +32,15 @@ def log_parsing():
 
     try:
         for line in sys.stdin:
+            # Increment line count
+            line_count += 1
+
+            # extract streams into a list separated by spaces
             parts = line.split()
 
             # Validate line format
             if len(parts) < 7:
-                continue
+                continue  # skip
 
             # Extract relevant parts
             try:
@@ -49,9 +53,6 @@ def log_parsing():
                 # Update status code count
                 if status_code in status_counts:
                     status_counts[status_code] += 1
-
-                # Increment line count
-                line_count += 1
 
                 # Print metrics every 10 lines
                 if line_count % 10 == 0:
