@@ -4,16 +4,14 @@ import sys
 import signal
 
 
-def handle_broken_pipe(signal, frame):
-    """Handle broken pipe error silently."""
-    sys.exit(0)
+total_size = 0  # Sum of file sizes
+status_counts = {
+    200: 0, 301: 0, 400: 0, 401: 0,
+    403: 0, 404: 0, 405: 0, 500: 0}  # Status code counts
+line_count = 0  # Line count tracker
 
 
-# Register the signal handler
-signal.signal(signal.SIGPIPE, handle_broken_pipe)
-
-
-def print_metrics(total_size, status_counts):
+def print_metrics():
     """Prints the total file size and status code metrics."""
     print(f"File size: {total_size}")
     for code in sorted(status_counts.keys()):
@@ -21,55 +19,53 @@ def print_metrics(total_size, status_counts):
             print(f"{code}: {status_counts[code]}")
 
 
-def log_parsing():
-    """Does actual log parsing
-    """
-    total_size = 0  # Sum of file sizes
-    status_counts = {
-        200: 0, 301: 0, 400: 0, 401: 0,
-        403: 0, 404: 0, 405: 0, 500: 0}  # Status code counts
-    line_count = 0  # Line count tracker
-
-    try:
-        for line in sys.stdin:
-            # Increment line count
-            line_count += 1
-
-            # extract streams into a list separated by spaces
-            parts = line.split()
-
-            # Validate line format
-            if len(parts) < 7:
-                continue  # skip
-
-            # Extract relevant parts
-            try:
-                status_code = int(parts[-2])
-                file_size = int(parts[-1])
-
-                # Update total size
-                total_size += file_size
-
-                # Update status code count
-                if status_code in status_counts:
-                    status_counts[status_code] += 1
-
-                # Print metrics every 10 lines
-                if line_count % 10 == 0:
-                    print_metrics(total_size, status_counts)
-
-            except (ValueError, IndexError):
-                # Skip line if there's an error in parsing
-                continue
-
-    except KeyboardInterrupt:
-        # Print final metrics on keyboard interrupt
-        print_metrics(total_size, status_counts)
-        raise
-
-    # Print final metrics after loop ends
-    print_metrics(total_size, status_counts)
+def handle_broken_pipe(signal, frame):
+    """Handle broken pipe error silently."""
+    print_metrics()
+    sys.exit(0)
 
 
-if __name__ == "__main__":
-    log_parsing()
+# Register the signal handler
+signal.signal(signal.SIGPIPE, handle_broken_pipe)
+
+
+try:
+    for line in sys.stdin:
+        # Increment line count
+        line_count += 1
+
+        # extract streams into a list separated by spaces
+        parts = line.split()
+
+        # Validate line format
+        if len(parts) < 7:
+            continue  # skip
+
+        # Extract relevant parts
+        try:
+            file_size = int(parts[-1])
+            # Update total size
+            total_size += file_size
+        except ValueError:
+            continue  # skip
+
+        try:
+            # extract status code -> second to last element
+            status_code = int(parts[-2])
+            # Update status code count
+            if status_code in status_counts:
+                status_counts[status_code] += 1
+        except (ValueError, IndexError):
+            continue  # skip
+
+        # Print metrics every 10 lines
+        if line_count % 10 == 0:
+            print_metrics()
+
+except KeyboardInterrupt:
+    # Print final metrics on keyboard interrupt
+    print_metrics()
+    raise
+
+# Print final metrics after loop ends
+print_metrics()
