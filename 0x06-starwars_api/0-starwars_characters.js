@@ -1,37 +1,46 @@
 #!/usr/bin/node
+const request = require('request');
+const ID = process.argv[2];
 
-const request = require("request");
+if (!ID) {
+  console.log('Error: Missing movie ID argument.');
+  process.exit(1);
+}
 
-// Get the Movie ID from the command-line argument
-const movieId = process.argv[2];
+const url = `https://swapi-api.alx-tools.com/api/films/${ID}/`;
 
-// Define the API endpoint with the Movie ID
-const apiUrl = `https://swapi-api.hbtn.io/api/films/${movieId}/`;
-
-// Make the request to the Star Wars API
-request(apiUrl, (error, response, body) => {
-  if (error) {
-    console.error(error);
+function getCharacter (listChar, index) {
+  if (!Array.isArray(listChar)) {
+    console.log("Error: 'listChar' is not an array.");
     return;
   }
 
-  // Parse the response body as JSON
-  const movieData = JSON.parse(body);
+  if (index === listChar.length) {
+    return;
+  }
 
-  // Get the array of character URLs from the response
-  const characters = movieData.characters;
-
-  // For each character URL, make an API call to get the character name
-  characters.forEach((characterUrl) => {
-    request(characterUrl, (error, response, body) => {
-      if (error) {
-        console.error(error);
-        return;
-      }
-
-      // Parse the character data and print the character name
-      const characterData = JSON.parse(body);
-      console.log(characterData.name);
-    });
+  request(`${listChar[index]}`, (error, response, body) => {
+    if (error) {
+      console.log(error);
+    } else {
+      const character = JSON.parse(response.body);
+      console.log(character.name);
+      getCharacter(listChar, index + 1);
+    }
   });
+}
+
+request(url, (error, response, body) => {
+  if (error) {
+    console.log(error);
+  } else {
+    const film = JSON.parse(response.body);
+    const listChar = film.characters;
+
+    if (Array.isArray(listChar)) {
+      getCharacter(listChar, 0);
+    } else {
+      console.log("Error: 'characters' is not an array or is undefined.");
+    }
+  }
 });
