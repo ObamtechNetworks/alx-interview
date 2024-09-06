@@ -16,10 +16,10 @@ request(apiUrl, (error, response, body) => {
   }
 
   // Parse the response body as JSON
-  const filmData = JSON.parse(body);
+  const movieData = JSON.parse(body);
 
   // Get the array of character URLs from the response
-  const characters = filmData.characters;
+  const characters = movieData.characters;
 
   // For each character URL, make an API call to get the character name
   characters.forEach((characterUrl) => {
