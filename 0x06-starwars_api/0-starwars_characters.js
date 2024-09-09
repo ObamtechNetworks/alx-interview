@@ -1,15 +1,15 @@
 #!/usr/bin/node
-const request = require('request');
+const request = require("request");
 const ID = process.argv[2];
 
 if (!ID) {
-  console.log('Error: Missing movie ID argument.');
+  console.log("Error: Missing movie ID argument.");
   process.exit(1);
 }
 
 const url = `https://swapi-api.alx-tools.com/api/films/${ID}/`;
 
-function getCharacter (listChar, index) {
+function getCharacter(listChar, index) {
   if (!Array.isArray(listChar)) {
     console.log("Error: 'listChar' is not an array.");
     return;
