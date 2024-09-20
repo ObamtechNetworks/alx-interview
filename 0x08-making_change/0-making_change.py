@@ -23,11 +23,10 @@ def makeChange(coins: List[int], total: int) -> int:
     dp[0] = 0  # No coins needed to make 0
 
     # Fill the dp table
-    for i in range(1, total + 1):
-        for c in coins:
-            if c <= i:
-                dp[i] = min(dp[i], dp[i - c] + 1)
+    for c in coins:
+        for i in range(c, total + 1):
+            dp[i] = min(dp[i], dp[i - c] + 1)
     # Return resultvcheck dp[total]. If it's still infinity
     # it means the total cannot be reached with the given coins,
     # so return -1. Otherwise, return dp[total].
-    return dp[total] if dp[total] != float("inf") else -1
+    return dp[total] if dp[total] != float('inf') else -1
